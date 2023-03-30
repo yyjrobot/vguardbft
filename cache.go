@@ -62,8 +62,8 @@ var vgTxData = struct {
 
 func storeVgTx(consInstID int) {
 	vgTxData.RLock()
-	ordBoo := vgTxData.tx[consInstID]
-	cmtBoo := vgTxData.boo[consInstID]
+	ordBoo := vgTxData.tx[consInstID] //ordering booth?
+	cmtBoo := vgTxData.boo[consInstID] //commit booth
 	vgTxData.RUnlock()
 
 	log.Infof("VGTX %d in Cmt Booth: %v | total # of tx: %d", consInstID, cmtBoo.Indices, vgrec.GetLastIdx()*BatchSize)

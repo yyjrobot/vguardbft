@@ -16,6 +16,25 @@ func mockRandomBytes(length int, charset string) []byte {
 	return b
 }
 
+func randomLatitude() float64 {
+	return rand.Float64()*(90-(-90)) + (-90)
+}
+
+func randomLongitude() float64 {
+	return rand.Float64()*(180-(-180)) + (-180)
+}
+
+
+func mockGpsData(length int) []byte {
+	b := make([]byte, length)
+
+	// for i := range b {
+	// 	b[i] = 
+	// }
+	return b
+}
+
+// TODO: Change here to add some vehicle driving data
 // txGenerator enqueues mock data entries to all message queues
 func txGenerator(len int) {
 	charset := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"

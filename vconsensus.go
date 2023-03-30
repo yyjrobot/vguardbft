@@ -50,6 +50,7 @@ func startConsensusPhaseA() {
 		var newMembers []int
 		var resentOPBEntries []ProposerOPBEntry
 
+		// Iterate through blocks? 
 		for _, blockID := range blockIDRange {
 			var blockEntries []Entry
 
