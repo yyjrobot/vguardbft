@@ -71,6 +71,9 @@ func startOrderingPhaseA(i int) {
 
 		entry := Entry{
 			TimeStamp: m.Timestamp,
+			lat: m.lat,
+			lon: m.lon,
+			speed: m.speed,
 			Tx:        m.Transaction,
 		}
 
