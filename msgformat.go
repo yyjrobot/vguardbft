@@ -9,7 +9,7 @@ type Proposal struct {
 	Timestamp   int64
 	lat float64
 	lon float64
-	speed int64
+	speed float64
 	Transaction []byte
 }
 
@@ -17,7 +17,7 @@ type Entry struct {
 	TimeStamp int64
 	lat float64
 	lon float64
-	speed int64
+	speed float64
 	Tx        []byte
 }
 

@@ -2,9 +2,11 @@ package main
 
 import (
 	"encoding/json"
+	"encoding/csv"
 	"math/rand"
 	"time"
-	//"fmt"
+	"fmt"
+	"os"
 	"strconv"
 )
 
@@ -55,27 +57,50 @@ func mockGpsData(length int) []byte {
 	return b
 }
 
+// https://stackoverflow.com/questions/24999079/reading-csv-file-in-go
+func readCsvFile(filePath string) [][]string {
+    f, err := os.Open(filePath)
+    if err != nil {
+        log.Fatal("Unable to read input file " + filePath, err)
+    }
+    defer f.Close()
+
+    csvReader := csv.NewReader(f)
+    records, err := csvReader.ReadAll()
+    if err != nil {
+        log.Fatal("Unable to parse file as CSV for " + filePath, err)
+    }
+
+    return records
+}
+
 // TODO: Change here to add some vehicle driving data
 // txGenerator enqueues mock data entries to all message queues
 func txGenerator(len int) {
 	charset := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-
+	// Hardcode vehiculer data file here
+	gps_data := readCsvFile("dataset_gps.csv")
+    fmt.Println(gps_data)
 
 
 	for i := 0; i < NumOfValidators; i++ {
 		q := make(chan *Proposal, MaxQueue)
 
 		for i := int64(0); i < MsgLoad; i++ {
-			rand_lat := randomLatitude()
-			rand_lon := randomLongitude()
-			log.Infof("lat: %v, lon: %v", rand_lat, rand_lon)
+			// rand_lat := randomLatitude()
+			// rand_lon := randomLongitude()
+			
+			// Take modulo here since we don't have that much data in our dataset
+			latitude, _ := strconv.ParseFloat(gps_data[i % 1000][1], 64)
+			longitude, _ := strconv.ParseFloat(gps_data[i % 1000][2], 64)
+			speed_meters_per_second, _ := strconv.ParseFloat(gps_data[i % 1000][6], 64)
+
+			// log.Infof("lat: %v, lon: %v", rand_lat, rand_lon)
 			q <- &Proposal{
 				Timestamp:   time.Now().UnixMicro(),
-				lat: rand_lat,
-				lon: rand_lon,
-				speed: rand.Int63(),
-				// lat: rand_lat,
-				// lon: rand_lon,
+				lat: latitude,
+				lon: longitude,
+				speed: speed_meters_per_second,
 				Transaction: mockRandomBytes(len, charset),
 				
 			}

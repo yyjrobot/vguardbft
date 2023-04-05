@@ -109,6 +109,8 @@ func receivingOADialMessages(coordinatorId ServerId) {
 	orderPhaseDialogInfo := dialogMgr.conns[OPB][coordinatorId]
 	dialogMgr.RUnlock()
 
+	err_count := 0
+
 	for {
 		var m ProposerOPAEntry
 
@@ -122,8 +124,13 @@ func receivingOADialMessages(coordinatorId ServerId) {
 		}
 
 		if err != nil {
+			err_count += 1
 			log.Errorf("Gob Decode Err: %v", err)
-			continue
+			if err_count >= 10 {
+				break
+			} else{
+				continue
+			}
 		}
 
 		go validatingOAEntry(&m, orderPhaseDialogInfo.enc)
@@ -136,6 +143,8 @@ func receivingOBDialMessages(coordinatorId ServerId) {
 	commitPhaseDialogInfo := dialogMgr.conns[CPA][coordinatorId]
 	dialogMgr.RUnlock()
 
+	err_count := 0
+
 	for {
 		var m ProposerOPBEntry
 
@@ -147,8 +156,13 @@ func receivingOBDialMessages(coordinatorId ServerId) {
 		}
 
 		if err != nil {
+			err_count += 1
 			log.Errorf("%s | gob Decode Err: %v", rpyPhase[OPB], err)
-			continue
+			if err_count >= 10 {
+				break
+			} else{
+				continue
+			}
 		}
 
 		go validatingOBEntry(&m, commitPhaseDialogInfo.enc)
@@ -159,6 +173,8 @@ func receivingCADialMessages(coordinatorId ServerId) {
 	dialogMgr.RLock()
 	CADialogInfo := dialogMgr.conns[CPA][coordinatorId]
 	dialogMgr.RUnlock()
+
+	err_count := 0
 
 	for {
 		var m ProposerCPAEntry
@@ -171,8 +187,13 @@ func receivingCADialMessages(coordinatorId ServerId) {
 		}
 
 		if err != nil {
+			err_count += 1
 			log.Errorf("%v: Gob Decode Err: %v", rpyPhase[CPA], err)
-			continue
+			if err_count >= 10 {
+				break
+			} else{
+				continue
+			}
 		}
 
 		go validatingCAEntry(&m, CADialogInfo.enc)
@@ -183,6 +204,8 @@ func receivingCBDialMessages(coordinatorId ServerId) {
 	dialogMgr.RLock()
 	CBDialogInfo := dialogMgr.conns[CPB][coordinatorId]
 	dialogMgr.RUnlock()
+
+	err_count := 0
 
 	for {
 		var m ProposerCPBEntry
@@ -195,8 +218,13 @@ func receivingCBDialMessages(coordinatorId ServerId) {
 		}
 
 		if err != nil {
+			err_count += 1
 			log.Errorf("%v: Gob Decode Err: %v", rpyPhase[CPB], err)
-			continue
+			if err_count >= 10 {
+				break
+			} else{
+				continue
+			}
 		}
 
 		go validatingCBEntry(&m, CBDialogInfo.enc)

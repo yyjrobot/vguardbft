@@ -112,6 +112,7 @@ func handleOPBConns(sConn *net.TCPConn, sid ServerId) {
 func handleCPAConns(sConn *net.TCPConn, sid ServerId) {
 
 	receiveCounter := int64(0)
+	err_count := 0
 
 	for {
 		var m ValidatorCPAReply
@@ -124,10 +125,17 @@ func handleCPAConns(sConn *net.TCPConn, sid ServerId) {
 			log.Errorf("%v | server %v closed connection | err: %v", time.Now(), sid, err)
 			break
 		}
-
+		
+		// Stop follower when error exceed certain times to avoid endless printing log
 		if err != nil {
+			err_count += 1
 			log.Errorf("Gob Decode Err: %v | conn with ser: %v | remoteAddr: %v | Now # %v", err, sid, (*sConn).RemoteAddr(), counter)
-			continue
+			if err_count >= 10 {
+				break
+			} else{
+				continue
+			}
+			
 		}
 
 		if &m != nil {
