@@ -22,3 +22,22 @@ keys/vguard_pub.dupe
 config/cluster_localhost copy.conf
 config/cluster_localhost.conf
 config/cluster_localhost.conf
+vginstance
+vguardbft.exe
+vginstance~
+keys/pri_3.dupe
+keys/vguard_pub.dupe
+keys/pri_5.dupe
+keys/pri_4.dupe
+keys/pri_2.dupe
+keys/pri_1.dupe
+keys/pri_0.dupe
+keys/pri_3.dupe
+keys/vguard_pub.dupe
+keys/pri_5.dupe
+keys/pri_4.dupe
+keys/pri_2.dupe
+keys/pri_1.dupe
+keys/pri_0.dupe
+*.dupe
+config/cluster_localhost.conf
