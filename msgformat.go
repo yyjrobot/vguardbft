@@ -7,17 +7,17 @@ package main
 
 type Proposal struct {
 	Timestamp   int64
-	lat string
-	lon string
-	speed string
+	Lat string
+	Lon string
+	Speed string
 	Transaction []byte
 }
 
 type Entry struct {
 	TimeStamp int64
-	lat string
-	lon string
-	speed string
+	Lat string
+	Lon string
+	Speed string
 	Tx        []byte
 }
 

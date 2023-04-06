@@ -72,7 +72,7 @@ func storeVgTx(consInstID int) {
 		log.Infof("ordering booth: %v | len(ordBoo[%v]): %v", key, key, len(chunk))
 		for _, entries := range chunk {
 			for _, e := range entries {
-				log.Infof("ts: %v; tx: %v, lat: %v, lon: %v, speed: %v", e.TimeStamp, hex.EncodeToString(e.Tx), e.lat, e.lon, e.speed)
+				log.Infof("ts: %v; tx: %v, lat: %v, lon: %v, speed: %v", e.TimeStamp, hex.EncodeToString(e.Tx), e.Lat, e.Lon, e.Speed)
 				//log.Infof("With out encoded: ts: %v; tx: %v", e.TimeStamp, e.Tx)
 			}
 		}

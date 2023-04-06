@@ -103,9 +103,9 @@ func txGenerator(len int) {
 			
 			q <- &Proposal{
 				Timestamp:   time.Now().UnixMicro(),
-				lat: latitudeStr,
-				lon: longitudeStr,
-				speed: speedStr,
+				Lat: latitudeStr,
+				Lon: longitudeStr,
+				Speed: speedStr,
 				Transaction: mockRandomBytes(len, charset),
 				
 			}

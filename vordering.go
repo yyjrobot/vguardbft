@@ -4,7 +4,7 @@ import (
 	"encoding/hex"
 	"sync"
 	"time"
-	"fmt"
+	// "fmt"
 )
 
 var vgrec IDRecorder
@@ -72,9 +72,9 @@ func startOrderingPhaseA(i int) {
 
 		entry := Entry{
 			TimeStamp: m.Timestamp,
-			lat: m.lat,
-			lon: m.lon,
-			speed: m.speed,
+			Lat: m.Lat,
+			Lon: m.Lon,
+			Speed: m.Speed,
 			Tx:        m.Transaction,
 		}
 		//fmt.Printf("Entry: %v, %v", entry.lat, entry.lon)
@@ -88,7 +88,7 @@ func startOrderingPhaseA(i int) {
 			continue
 		}
 
-		fmt.Printf("Entry: %v, %v", shuffle.entries[0].lat, shuffle.entries[0].lon)
+		// fmt.Printf("Entry: %v, %v", shuffle.entries[0].Lat, shuffle.entries[0].Lon)
 
 		serializedEntries, err := serialization(shuffle.entries)
 		if err != nil {

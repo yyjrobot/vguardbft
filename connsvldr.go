@@ -128,6 +128,8 @@ func receivingOADialMessages(coordinatorId ServerId) {
 			log.Errorf("Gob Decode Err: %v", err)
 			if err_count >= 10 {
 				log.Errorf("Stop print OAD dial err msgs")
+				log.Warnf("Terminating current VGuard instance")
+				vgInst.Done()
 				break
 			} else{
 				continue
@@ -160,6 +162,8 @@ func receivingOBDialMessages(coordinatorId ServerId) {
 			err_count += 1
 			log.Errorf("%s | gob Decode Err: %v", rpyPhase[OPB], err)
 			if err_count >= 10 {
+				log.Warnf("Terminating current VGuard instance")
+				vgInst.Done()
 				break
 			} else{
 				continue
@@ -191,6 +195,8 @@ func receivingCADialMessages(coordinatorId ServerId) {
 			err_count += 1
 			log.Errorf("%v: Gob Decode Err: %v", rpyPhase[CPA], err)
 			if err_count >= 10 {
+				log.Warnf("Terminating current VGuard instance")
+				vgInst.Done()
 				break
 			} else{
 				continue
@@ -222,6 +228,8 @@ func receivingCBDialMessages(coordinatorId ServerId) {
 			err_count += 1
 			log.Errorf("%v: Gob Decode Err: %v", rpyPhase[CPB], err)
 			if err_count >= 10 {
+				log.Warnf("Terminating current VGuard instance")
+				vgInst.Done()
 				break
 			} else{
 				continue
