@@ -5,7 +5,6 @@ import (
 	"encoding/csv"
 	"math/rand"
 	"time"
-	"fmt"
 	"os"
 	"strconv"
 )
@@ -78,9 +77,9 @@ func readCsvFile(filePath string) [][]string {
 // txGenerator enqueues mock data entries to all message queues
 func txGenerator(len int) {
 	charset := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	
 	// Hardcode vehiculer data file here
 	gps_data := readCsvFile("dataset_gps.csv")
-    fmt.Println(gps_data)
 
 
 	for i := 0; i < NumOfValidators; i++ {
@@ -89,18 +88,24 @@ func txGenerator(len int) {
 		for i := int64(0); i < MsgLoad; i++ {
 			// rand_lat := randomLatitude()
 			// rand_lon := randomLongitude()
+			// log.Infof("lat: %v, lon: %v", rand_lat, rand_lon)
 			
 			// Take modulo here since we don't have that much data in our dataset
-			latitude, _ := strconv.ParseFloat(gps_data[i % 1000][1], 64)
-			longitude, _ := strconv.ParseFloat(gps_data[i % 1000][2], 64)
-			speed_meters_per_second, _ := strconv.ParseFloat(gps_data[i % 1000][6], 64)
+			// +1 to skip the first row
+			latitude, _ := strconv.ParseFloat(gps_data[i % 1000 + 1][1], 64)
+			longitude, _ := strconv.ParseFloat(gps_data[i % 1000 + 1][2], 64)
+			speed_meters_per_second, _ := strconv.ParseFloat(gps_data[i % 1000 + 1][6], 64)
 
-			// log.Infof("lat: %v, lon: %v", rand_lat, rand_lon)
+			latitudeStr := strconv.FormatFloat(latitude, 'f', 8, 64)
+			longitudeStr := strconv.FormatFloat(longitude, 'f', 8, 64)
+			speedStr := strconv.FormatFloat(speed_meters_per_second, 'f', 8, 64)
+
+			
 			q <- &Proposal{
 				Timestamp:   time.Now().UnixMicro(),
-				lat: latitude,
-				lon: longitude,
-				speed: speed_meters_per_second,
+				lat: latitudeStr,
+				lon: longitudeStr,
+				speed: speedStr,
 				Transaction: mockRandomBytes(len, charset),
 				
 			}

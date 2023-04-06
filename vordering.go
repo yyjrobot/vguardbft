@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"sync"
 	"time"
+	"fmt"
 )
 
 var vgrec IDRecorder
@@ -76,13 +77,18 @@ func startOrderingPhaseA(i int) {
 			speed: m.speed,
 			Tx:        m.Transaction,
 		}
+		//fmt.Printf("Entry: %v, %v", entry.lat, entry.lon)
 
 		shuffle.entries[shuffle.counter] = entry
+
+		
 
 		shuffle.counter++
 		if shuffle.counter < BatchSize {
 			continue
 		}
+
+		fmt.Printf("Entry: %v, %v", shuffle.entries[0].lat, shuffle.entries[0].lon)
 
 		serializedEntries, err := serialization(shuffle.entries)
 		if err != nil {
