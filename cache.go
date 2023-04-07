@@ -92,7 +92,7 @@ func storeToDB(e Entry) (id interface{}) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	collection := client.Database("testing").Collection("numbers")
+	collection := client.Database("Mongo").Collection("vehical_data")
 	res, err := collection.InsertOne(ctx, e)
 	id = res.InsertedID
 	if err != nil {
