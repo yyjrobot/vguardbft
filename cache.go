@@ -8,8 +8,13 @@ ordering and consensus phases.
 */
 
 import (
+	"context"
 	"encoding/hex"
 	"sync"
+	"time"
+
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // ordSnapshot stores consensus information for each block in the ordering phase
@@ -62,7 +67,7 @@ var vgTxData = struct {
 
 func storeVgTx(consInstID int) {
 	vgTxData.RLock()
-	ordBoo := vgTxData.tx[consInstID] //ordering booth?
+	ordBoo := vgTxData.tx[consInstID]  //ordering booth?
 	cmtBoo := vgTxData.boo[consInstID] //commit booth
 	vgTxData.RUnlock()
 
@@ -74,7 +79,24 @@ func storeVgTx(consInstID int) {
 			for _, e := range entries {
 				log.Infof("ts: %v; tx: %v, lat: %v, lon: %v, speed: %v", e.TimeStamp, hex.EncodeToString(e.Tx), e.Lat, e.Lon, e.Speed)
 				//log.Infof("With out encoded: ts: %v; tx: %v", e.TimeStamp, e.Tx)
+
 			}
 		}
 	}
+}
+
+func storeToDB(e Entry) (id interface{}) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	collection := client.Database("testing").Collection("numbers")
+	res, err := collection.InsertOne(ctx, e)
+	id = res.InsertedID
+	if err != nil {
+		log.Fatal(err)
+	}
+	return
 }
