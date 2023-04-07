@@ -112,6 +112,9 @@ var (
 	// Below parameters are used for catering factor evaluation.
 	//SlowModeCycleNum    int
 	//SleepTimeInSlowMode int
+
+	// Below parameters are used for enable db storage
+	DataBaseMode	string
 )
 
 func loadCmdParameters() {
@@ -142,6 +145,11 @@ func loadCmdParameters() {
 
 	//flag.IntVar(&SlowModeCycleNum, "sm", 3, "# of cycles going in slow mode")
 	//flag.IntVar(&SleepTimeInSlowMode, "smt", 1, "slow mode cycle sleep time (second)")
+
+	// nodb = vanilla VG
+	// mongo = store using mongo
+	// bigchain = store with bigchain
+	flag.StringVar(&DataBaseMode, "db", "nodb", "Which db to store your data or no db")
 
 	flag.Parse()
 

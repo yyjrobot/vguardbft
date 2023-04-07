@@ -60,6 +60,15 @@ var vgTxData = struct {
 	boo: make(map[int]Booth),
 }
 
+func processEntries(entries [][]Entry) {
+	for _, chunk := range entries {
+		for _, e := range chunk {
+			log.Infof("ts: %v; tx: %v, lat: %v, lon: %v, speed: %v", e.TimeStamp, hex.EncodeToString(e.Tx), e.Lat, e.Lon, e.Speed)
+
+		}
+	}
+}
+
 func storeVgTx(consInstID int) {
 	vgTxData.RLock()
 	ordBoo := vgTxData.tx[consInstID] //ordering booth?
@@ -68,12 +77,19 @@ func storeVgTx(consInstID int) {
 
 	log.Infof("VGTX %d in Cmt Booth: %v | total # of tx: %d", consInstID, cmtBoo.Indices, vgrec.GetLastIdx()*BatchSize)
 
-	for key, chunk := range ordBoo { //map<boo, [][]entries>
-		log.Infof("ordering booth: %v | len(ordBoo[%v]): %v", key, key, len(chunk))
-		for _, entries := range chunk {
-			for _, e := range entries {
-				log.Infof("ts: %v; tx: %v, lat: %v, lon: %v, speed: %v", e.TimeStamp, hex.EncodeToString(e.Tx), e.Lat, e.Lon, e.Speed)
-				//log.Infof("With out encoded: ts: %v; tx: %v", e.TimeStamp, e.Tx)
+	dbmode_noDB := "nodb"
+	// dbmode_mongo := "mongo"
+	// dbmode_bigchain := "bigchain"
+
+	if (DataBaseMode == dbmode_noDB){
+		for key, chunk := range ordBoo { //map<boo, [][]entries>
+			log.Infof("ordering booth: %v | len(ordBoo[%v]): %v", key, key, len(chunk))
+			for _, entries := range chunk {
+				for _, e := range entries {
+					log.Infof("ts: %v; tx: %v, lat: %v, lon: %v, speed: %v", e.TimeStamp, hex.EncodeToString(e.Tx), e.Lat, e.Lon, e.Speed)
+					//log.Infof("With out encoded: ts: %v; tx: %v", e.TimeStamp, e.Tx)
+	
+				}
 			}
 		}
 	}

@@ -17,7 +17,8 @@
 -pm=false \
 -s=true \
 -w=1 \
--yc=0
+-yc=0 \
+-db="nodb"
 
 # To run in cluster, change -cfp to the cluster config file.
 # E.g., -cfp="./config/cluster_4.conf"
