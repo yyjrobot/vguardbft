@@ -12,7 +12,6 @@ import (
 	"encoding/hex"
 	"sync"
 	"time"
-
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -105,7 +104,6 @@ func storeToDB(e Entry) (id interface{}) {
 
 
 
-
 func storeVgTx(consInstID int) {
 	vgTxData.RLock()
 	ordBoo := vgTxData.tx[consInstID]  //ordering booth?
@@ -114,33 +112,48 @@ func storeVgTx(consInstID int) {
 
 	log.Infof("VGTX %d in Cmt Booth: %v | total # of tx: %d", consInstID, cmtBoo.Indices, vgrec.GetLastIdx()*BatchSize)
 
-	entryCount := int64(0)
-	chunkCount := int64(0)
+	
+	//chunkCount := int64(0)
+	
+
+	// Connect to Mongo
+	DBstartTime := time.Now().UnixMicro()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://127.0.0.1:27017"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	collection := client.Database("Mongo").Collection("vehicle_data")
+	DBendTime := time.Now().UnixMicro()
+	log.Infof("DB connection overhead: %v micro seonds", DBendTime - DBstartTime)
+
 	mongoStoreTime := int64(0)
+	entryCount := int64(0)
 
 	for key, chunk := range ordBoo { //map<boo, [][]entries>
 		log.Infof("ordering booth: %v | len(ordBoo[%v]): %v", key, key, len(chunk))
 		
 		for _, entries := range chunk {
-			chunkCount++
-			// Store entry to mongo
-			startTime := time.Now().UnixMilli()
-			storeChunkToDB(entries)
-			endTime := time.Now().UnixMilli()
-			mongoStoreTime += (endTime - startTime)
 			for _, e := range entries {
 				log.Infof("ts: %v; tx: %v, lat: %v, lon: %v, speed: %v", e.TimeStamp, hex.EncodeToString(e.Tx), e.Lat, e.Lon, e.Speed)
-				//log.Infof("With out encoded: ts: %v; tx: %v", e.TimeStamp, e.Tx)
 				entryCount++
 
-				
-
+				// Store entry to mongo
+				startTime := time.Now().UnixMicro()
+				_, err := collection.InsertOne(ctx, e)
+				if err != nil {
+					log.Fatal(err)
+				}
+				endTime := time.Now().UnixMicro()
+				mongoStoreTime += (endTime - startTime)
+				log.Infof("Entry Store latency: %v micro seonds", endTime - startTime)
 			}
 		}
 		
 	}
-	log.Infof("Store finished, avg latency for each entry: %v", mongoStoreTime/entryCount)
-	log.Infof("Avg latency for each entries in chunk: %v", mongoStoreTime/chunkCount)
+	log.Infof("Store finished, avg latency for each entry: %v micro seonds", mongoStoreTime/entryCount)
+	//log.Infof("Avg latency for each entries in chunk: %v", mongoStoreTime/chunkCount)
 }
 
 

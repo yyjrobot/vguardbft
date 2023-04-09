@@ -42,3 +42,4 @@ keys/pri_0.dupe
 *.dupe
 config/cluster_localhost.conf
 *.log
+config/cluster_localhost.conf
