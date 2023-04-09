@@ -65,6 +65,47 @@ var vgTxData = struct {
 	boo: make(map[int]Booth),
 }
 
+func storeChunkToDB(chunk []Entry) (ids []interface{}) {
+    ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+    defer cancel()
+    client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://127.0.0.1:27017"))
+    if err != nil {
+        log.Fatal(err)
+    }
+    collection := client.Database("Mongo").Collection("vehicle_data")
+    var documents []interface{}
+    for _, e := range chunk {
+        documents = append(documents, e)
+    }
+    res, err := collection.InsertMany(ctx, documents)
+    if err != nil {
+        log.Fatal(err)
+    }
+    for _, id := range res.InsertedIDs {
+        ids = append(ids, id)
+    }
+    return
+}
+
+func storeToDB(e Entry) (id interface{}) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://127.0.0.1:27017"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	collection := client.Database("Mongo").Collection("vehicle_data")
+	res, err := collection.InsertOne(ctx, e)
+	id = res.InsertedID
+	if err != nil {
+		log.Fatal(err)
+	}
+	return
+}
+
+
+
+
 func storeVgTx(consInstID int) {
 	vgTxData.RLock()
 	ordBoo := vgTxData.tx[consInstID]  //ordering booth?
@@ -73,30 +114,33 @@ func storeVgTx(consInstID int) {
 
 	log.Infof("VGTX %d in Cmt Booth: %v | total # of tx: %d", consInstID, cmtBoo.Indices, vgrec.GetLastIdx()*BatchSize)
 
+	entryCount := int64(0)
+	chunkCount := int64(0)
+	mongoStoreTime := int64(0)
+
 	for key, chunk := range ordBoo { //map<boo, [][]entries>
 		log.Infof("ordering booth: %v | len(ordBoo[%v]): %v", key, key, len(chunk))
+		
 		for _, entries := range chunk {
+			chunkCount++
+			// Store entry to mongo
+			startTime := time.Now().UnixMilli()
+			storeChunkToDB(entries)
+			endTime := time.Now().UnixMilli()
+			mongoStoreTime += (endTime - startTime)
 			for _, e := range entries {
 				log.Infof("ts: %v; tx: %v, lat: %v, lon: %v, speed: %v", e.TimeStamp, hex.EncodeToString(e.Tx), e.Lat, e.Lon, e.Speed)
 				//log.Infof("With out encoded: ts: %v; tx: %v", e.TimeStamp, e.Tx)
+				entryCount++
+
+				
 
 			}
 		}
+		
 	}
+	log.Infof("Store finished, avg latency for each entry: %v", mongoStoreTime/entryCount)
+	log.Infof("Avg latency for each entries in chunk: %v", mongoStoreTime/chunkCount)
 }
 
-func storeToDB(e Entry) (id interface{}) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
-	if err != nil {
-		log.Fatal(err)
-	}
-	collection := client.Database("Mongo").Collection("vehical_data")
-	res, err := collection.InsertOne(ctx, e)
-	id = res.InsertedID
-	if err != nil {
-		log.Fatal(err)
-	}
-	return
-}
+
