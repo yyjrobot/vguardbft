@@ -1,49 +1,38 @@
 <h1 align="center"> V-Guard: An Efficient Permissioned Blockchain for Achieving Consensus under Dynamic Memberships in V2X Networks </h1>
 
 
-## About V-Guard
+## About V-Guard with Database Integration (MongoDB Blockchain DB) 
 
 V-Guard achieves high performance operating under dynamically changing memberships, targeting the problem of vehicles' arbitrary connectivity on the roads. When membership changes occur, traditional BFT algorithms (e.g., PBFT and HotStuff) must stop to update system configurations using additional membership management approaches, thereby suffering from severe performance degradation.
 
-In contrast, V-Guard integrates the consensus of membership management into the consensus of data transactions. In a consensus process, The integration makes V-Guard achieve consensus seamlessly under changing members (e.g., with joining or leaving vehicles) and produces an immutable ledger recording traceable data transactions with their corresponding membership profiles.
 
-    Consensus target of tradition BFT algorithms: <data transactions>
-    Consensus target of V-Guard: <data transactions, membership profiles>
-
-Check out the paper at: https://arxiv.org/abs/2301.06210
+The current V-Guard design only is limited to storing the consensus log locally. This project extends the above V-Guard consensus protocol, with an integration to a cloud based database (MongoDB Blockchain DB).
 
 ## Use Case
 V-Guard is a flexible blockchain platform that allows users to define their own message types. This platform enables vehicles to reach a consensus on the decisions made by their autonomous driving software. The messages can include various data, such as GPS location, speed, direction, acceleration, bearing, and more (similar categories to the data set of
 [Passive Vehicular Sensors](https://www.kaggle.com/datasets/jefmenegazzo/pvs-passive-vehicular-sensors-datasets?resource=download-directory)).
 
-V-Guard offers a solution to the trust and accountability issues associated with accident data by providing a guarantee of data accuracy and integrity. Our blockchain technology effectively addresses three key challenges that are often encountered with traditional centralized solutions:
 
-- <span style="color: indigo;">**Transparency in data management.</span>** Data is more easily accessible to drivers, thereby preventing manufacturers from monopolizing it.
-- <span style="color: indigo;">**Integrity in data management.</span>** V-Guard prevents data tampering. There is no room for manipulation or concealment of evidence by either drivers or manufacturers. V-Guard ensures that data cannot be fabricated or deleted, even if it goes against the interests of the parties involved in legal proceedings
-- <span style="color: indigo;">**Accountability in data management.</span>** V-Guard promotes data accountability and ownership protections, creating a trusted environment within the industry, and ensuring compliance with data management regulations, such as GDPR and CPRA.
+### Solution
+- Vehicular Data
+After the consensus process of vanilla V-Guard has been completed, the Vehicular Data is sent to MongoDB to be stored with a timestamp. The dataset that is being pushed to MongoDB are [Passive Vehicular Sensors Dataset (PVS)](https://www.kaggle.com/datasets/jefmenegazzo/pvs-passive-vehicular-sensors-datasets?resource=download).
 
-## Features and Workflow
+## Real Life Applications
+### Determine Vehicle Collision Responsiblities
+- By providing a backup of dataset that is not stored locally, this data can be used later as evidence for any legal proceedings.
 
-#### Membership Management Unit (MMU)
-V-Guard develops a Membership Management Unit (MMU) that keeps track of available vehicle connections and manages membership profiles. The MMU describes a membership profile that contains a set of vehicles as a **booth**. Below illustrates the management of booths (of size 4) when vehicles are communicating via [Dedicated Short-Range Communication](https://en.wikipedia.org/wiki/Dedicated_short-range_communications).
+### Providing Transparency
+- The dataset provides transparency to all vehicles on the road, on the make, model, and vehicular data.
 
-![](./docs/booths.gif)
-
-### An Example of V-Guard's workflow
-In the below example, the yellow car is the proposer, and the MMU manages 10 members. The consensus target are the data (in blue font) and membership (in red font), where O is the orderingID (sequence #), B is the data batch, V is the booth, Q is the quorum, and Sigma is the threshold signature.
-
-![](./docs/mmu-ordering.png)
-
-Ordering instances can take place in different booths. E.g., when the proposer conducts consensus for data entry 1, the ordering takes place in Booth 1. When Booth 1 is still available, the next ordering instance reuses it (e.g., data entry 2). However, when Booth 1 becomes unavailable (e.g., some vehicles go offline), the MMU will provide a new booth (i.e., Booth 2) for the next ordering instance.
-
-![](./docs/mmu-consensus.png)
-
-Consensus instances are executed periodically as "shuttle buses" with a sole purpose of committing the entries appended on the total order log. A consensus instance (C) can also operate in a different booth where the new members will scrutinize the signatures of included entries that they have not validated previously.
+### Prevention of Vehicle Theft
+- By extending V-Guard with a cloud databse, it allows better tracking of stolen vehicles to be tracked down and retrieved.
 
 ## Try the Current Version
 
 ### Install dependencies
 GoLang should have been properly installed with `GOPATH` and `GOROOT`. The GoLang version should be at least `go1.17.6`. In addition, three external packages were used (check out `go.mod`).
+
+Install the latest version of docker container.
 
     // threshold signatures
     go get go.dedis.ch/kyber
@@ -51,6 +40,14 @@ GoLang should have been properly installed with `GOPATH` and `GOROOT`. The GoLan
     go get github.com/sirupsen/logrus
     // some math packages
     go get gonum.org/v1/gonum/
+    // mongodb
+    go get go.mongodb.org/mongo-driver
+
+### Run MongoDB instances locally
+Below shows an example of running a mongodb database locally. 
+
+    $ docker pull mongo
+    $ docker run -d -p 27017:27017 --name mongo mongo:latest
 
 ### Run V-Guard instances locally
 Below shows an example of running a V-Guard instance with a booth of size 4 and 6 initial available connections. The quorum size of a booths of size 4 is 3, so the threshold is set to 2, as the proposer is always included.
@@ -96,7 +93,13 @@ Below shows an example of running a V-Guard instance with a booth of size 4 and 
 
 Check out `parameters.go` for further parameters tuning.
 
-## Projects using V-Guard
-| Project Name                                           | Authors                     | Features                                                              |
-|:-------------------------------------------------------|:----------------------------|:----------------------------------------------------------------------|
-| [VGuardDB](https://github.com/timchenggu123/vguard_db) | Michalis Bachras, Tim Cheng | Efficiently Storing and Accessing Data from V2X Networks Using VGuard |
+After running V-Guard instances locally, you should be able to see the vehicle_data table in mongodb by running
+    $ show dbs
+      vehicle_data
+
+The latency data can be revisited via `/logs` folder.
+
+## Original V-Guard Project
+| Paper         |   Authors                  |                                         
+|:-------------------------------------------------------|:----------------------------|
+| [VGuardDB](https://github.com/vguardbc/vguardbft) | Edward (Gengrui) Zhang
