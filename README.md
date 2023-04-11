@@ -1,17 +1,11 @@
-<h1 align="center"> V-Guard: An Efficient Permissioned Blockchain for Achieving Consensus under Dynamic Memberships in V2X Networks </h1>
+<h1 align="center"> V-Guard with Database Integration (MongoDB) </h1>
 
+This project is build based on [V-Guard](https://github.com/vguardbc/vguardbft) by Edward (Gengrui) Zhang.
 
-## About V-Guard with Database Integration (MongoDB Blockchain DB) 
+## About V-Guard with Database Integration (MongoDB) 
 
-V-Guard achieves high performance operating under dynamically changing memberships, targeting the problem of vehicles' arbitrary connectivity on the roads. When membership changes occur, traditional BFT algorithms (e.g., PBFT and HotStuff) must stop to update system configurations using additional membership management approaches, thereby suffering from severe performance degradation.
-
-
-The current V-Guard design only is limited to storing the consensus log locally. This project extends the above V-Guard consensus protocol, with an integration to a cloud based database (MongoDB Blockchain DB).
-
-## Use Case
-V-Guard is a flexible blockchain platform that allows users to define their own message types. This platform enables vehicles to reach a consensus on the decisions made by their autonomous driving software. The messages can include various data, such as GPS location, speed, direction, acceleration, bearing, and more (similar categories to the data set of
-[Passive Vehicular Sensors](https://www.kaggle.com/datasets/jefmenegazzo/pvs-passive-vehicular-sensors-datasets?resource=download-directory)).
-
+V-Guard is a recent paper that proposed a design for a new permissioned blockchain system dedicated to achieve consensus for vehicular data under changing memberships. The goal of V-Guard is grant full vehicular data access to consumers to avoid the centralized data monopoly of manufacturers. However, current V-Guard design only supports storing the consensus log locally, which could become an issue if the vehicle get involved in an accident and caused the storage component to be broken. In such case a remote backup of the data could be vital for law purposes. Hence this project aims to extend current V-Guard implementation with database to store the consensus log in addition to directly storing on vehicles to avoid the issue that could caused by data loss during a vehicle accident. We will also evaluate the performance of connecting V-Guard to a database comparing to V-Guard BFT without any modification.
+This project extends the above V-Guard consensus protocol, with an integration to a cloud based database (MongoDB). 
 
 ### Solution
 - Vehicular Data
@@ -27,8 +21,8 @@ After the consensus process of vanilla V-Guard has been completed, the Vehicular
 ### Prevention of Vehicle Theft
 - By extending V-Guard with a cloud databse, it allows better tracking of stolen vehicles to be tracked down and retrieved.
 
-## Try the Current Version
 
+## Instructions (Based on V-Guard instructions)
 ### Install dependencies
 GoLang should have been properly installed with `GOPATH` and `GOROOT`. The GoLang version should be at least `go1.17.6`. In addition, three external packages were used (check out `go.mod`).
 
@@ -98,8 +92,3 @@ After running V-Guard instances locally, you should be able to see the vehicle_d
       vehicle_data
 
 The latency data can be revisited via `/logs` folder.
-
-## Original V-Guard Project
-| Paper         |   Authors                  |                                         
-|:-------------------------------------------------------|:----------------------------|
-| [VGuardDB](https://github.com/vguardbc/vguardbft) | Edward (Gengrui) Zhang
